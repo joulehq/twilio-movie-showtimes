@@ -13,7 +13,7 @@ var response = require('joule-node-response');
 
 exports.handler = function(event, context) {
   if(typeof(event.Body) === "undefined") {
-    response.error400(context, 'No Body passed in');
+    response.error400(context, {message: 'no Body passed in', event: event});
     return;
   }
   response.successRaw(context, "<Response><Sms>"+event.Body+"</Sms></Response>");
