@@ -12,3 +12,10 @@ methods:
       - 200 # Can only have one 2xx status code and it must be first in the list
     query_string_params:
       - Body # accessible as process.env.myQueryStringParam
+  POST:
+    response_header:
+      content_type: 'text/xml'
+    status_codes:
+      - 200 # Can only have one 2xx status code and it must be first in the list
+    query_string_params:
+      - Body # accessible as process.env.myQueryStringParam
