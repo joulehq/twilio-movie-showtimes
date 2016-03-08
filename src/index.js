@@ -10,7 +10,7 @@
  *    event.{queryStringParam}, Query string parameters as defined in your .joule.yml
  */
 var Response = require('joule-node-response');
-var Showtimes = require('showtimes');
+var Showtimes = require('./showtimes');
 
 var CONST = {
   initialState: 'start',
@@ -99,7 +99,6 @@ exports.handler = function(event, context) {
 
   response.setContext(context);
   response.setContentType('application/xml');
-
   
   switch(thisState) {
     case 'start':

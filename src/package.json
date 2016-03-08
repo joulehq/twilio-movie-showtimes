@@ -5,7 +5,9 @@
   "main": "index.js",
   "dependencies": {
     "joule-node-response": "<2.0.0",
-    "showtimes": "^2.1.0"
+    "cheerio": "^0.18.0",
+    "iconv-lite": "^0.4.10",
+    "request": "^2.51.0"
   },
   "devDependencies": {
     "joule-node-local": "<2.0.0"
