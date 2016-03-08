@@ -10,6 +10,7 @@
  *    event.{queryStringParam}, Query string parameters as defined in your .joule.yml
  */
 var Response = require('joule-node-response');
+var Showtimes = require('showtimes');
 
 var CONST = {
   initialState: 'start',
@@ -33,11 +34,43 @@ var TwimlGenerator = function() {
   this.generate = function (action, say, url) {
     switch(action) {
       case 'gather':
-        return '<?xml version="1.0" encoding="UTF-8"?> <Response> <Gather timeout="10" finishOnKey="*" action="'+url+'"> <Say>'+say+'</Say> </Gather> </Response>';
+        return ;
       case  'say':
-        return '<?xml version="1.0" encoding="UTF-8"?> <Response> <Say>'+say+'</Say></Response>';
+        return '<?xml version="1.0" encoding="UTF-8"?> <Response> <Say voice="alice">'+say+'</Say></Response>';
     }
   };
+};
+
+var start = function(event, response) {
+  response.send('<?xml version="1.0" encoding="UTF-8"?> <Response> <Gather timeout="10" finishOnKey="#" action="'+CONST.baseUrl+'/greet"> <Say voice="alice">Hello, I\'m Rachel. Enter your zipcode and I will look up movie showtimes for you.</Say> </Gather> </Response>');
+};
+
+var greet = function(event, response) {
+  var showtimes = new Showtimes(event.post['Digits'], {});
+  showtimes.getTheaters(function(err, theaters) {
+    if(err) {
+      console.log(err);
+      response.send('<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Oh no! I don\'t know what happened.</Say></Response>');
+    }
+    
+    var res = [];
+    for(var i in theaters) {
+      if(i > 4) {
+        break;
+      }
+      res.push({id: theaters[i].id, name: theaters[i].name});
+    }
+
+    var out = '<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Looks like I found ' + theaters.length + ' theaters in your area. Here are the top ' + res.length + '.</Say>';
+    for(var j in res) {
+      out += '<Say>' + res[j].name + '</Say>';
+      if(j <= res.length-1) {
+        out += '<Pause length="3"/>';
+      }
+    }
+
+    response.send(out);
+  });
 };
 
 /*
@@ -67,6 +100,11 @@ exports.handler = function(event, context) {
   response.setContext(context);
   response.setContentType('application/xml');
 
-  thisStateMap = stateMap[thisState];
-  response.send(twimlGenerator.generate(thisStateMap.action, thisStateMap.say, thisStateMap.url));
+  
+  switch(thisState) {
+    case 'start':
+      start(event, response);
+    case 'greet':
+      greet(event, response);
+  }
 };
