@@ -30,6 +30,7 @@ var start = function(event, response) {
 
   twimlResponse.gather({
       finishOnKey: '#',
+      numDigits: 5,
       action: CONST.baseUrl+'/theaters'
     }, function() {
       this.say('Hello, I\'m Rachel. Enter your zipcode and I will look up movie showtimes for you.', CONST.twimlSayOptions);
@@ -39,7 +40,7 @@ var start = function(event, response) {
 };
 
 var theaters = function(event, response) {
-  var zipcode = event.post['Digits'] || event.post['CallerZip']
+  var zipcode = event.post['Digits']
       , showtimes = new Showtimes(zipcode, {})
       , twimlResponse = new TwimlResponse();
   showtimes.getTheaters(function(err, theaters) {
