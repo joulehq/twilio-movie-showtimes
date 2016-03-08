@@ -1,3 +1,4 @@
+"use strict"; 
 /**
  * This is the boilerplate repository for creating Twilio Joules which can be used as a webhook.
  */
@@ -138,7 +139,7 @@ var showtimes = function(event, response) {
     var movies
         , movie
         , showtimes
-        , counter = 1;
+        , counter;
     for(i in theaters) {
       if(theaters[i].id == theaterId) {
         movies = theaters[i].movies;
@@ -146,12 +147,14 @@ var showtimes = function(event, response) {
       }
     }
 
+    counter = 1;
     for(var i in movies) {
       if(counter == event.query['Digits']) {
         movie = movies[i];
         showtimes = movie.showtimes;
         break;
       }
+      counter++;
     }
 
     twimlResponse.gather({
