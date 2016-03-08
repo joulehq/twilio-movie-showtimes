@@ -39,7 +39,8 @@ var start = function(event, response) {
 };
 
 var greet = function(event, response) {
-  var showtimes = new Showtimes(event.post['Digits'], {})
+  var zipcode = event.post['Digits']
+      , showtimes = new Showtimes(zipcode, {})
       , twimlResponse = new TwimlResponse();
   showtimes.getTheaters(function(err, theaters) {
     if(err) {
@@ -60,7 +61,7 @@ var greet = function(event, response) {
     twimlResponse.say('Looks like I found ' + theaters.length + ' theaters in your area. Here are the top ' + res.length + '.', CONST.twimlSayOptions);
     twimlResponse.gather({
       finishOnKey: '#',
-      action: CONST.baseUrl+'/movies?zipcode='+event.post['Digits']
+      action: CONST.baseUrl+'/movies?zipcode='+zipcode
     }, function() {
       var counter = 1;
       for(var j in res) {
