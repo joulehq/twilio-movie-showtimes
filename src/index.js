@@ -28,6 +28,7 @@ var start = function(event, response) {
   var twimlResponse = new TwimlResponse();
 
   twimlResponse.gather({
+      method: 'GET',
       timeout: 10,
       numDigits: 5,
       action: CONST.baseUrl+'/theaters'
@@ -39,7 +40,7 @@ var start = function(event, response) {
 };
 
 var theaters = function(event, response) {
-  var zipcode = event.post['Digits']
+  var zipcode = event.query['Digits']
       , showtimes = new Showtimes(zipcode, {})
       , twimlResponse = new TwimlResponse();
   showtimes.getTheaters(function(err, theaters) {
@@ -60,6 +61,7 @@ var theaters = function(event, response) {
 
     twimlResponse.say('Looks like I found ' + theaters.length + ' theaters in your area. Here are the top ' + res.length + '.', CONST.twimlSayOptions);
     twimlResponse.gather({
+      method: 'GET',
       action: CONST.baseUrl+'/movies?zipcode='+zipcode
     }, function() {
       var counter = 1;
@@ -92,7 +94,7 @@ var movies = function(event, response) {
     
     var counter = 1;
     for(var i in theaters) {
-      if(counter == event.post['Digits']) {
+      if(counter == event.query['Digits']) {
         theater = theaters[i];
         movies = theater['movies'];
         break;
@@ -102,6 +104,7 @@ var movies = function(event, response) {
 
     twimlResponse.say('I found ' + movies.length + ' movies playing at ' + theater.name + '. Here are the top 5. You can press the movie\'s number at any time and I\'ll send you a link to purchase tickets.', CONST.twimlSayOptions);
     twimlResponse.gather({
+      method: 'GET',
       action: CONST.baseUrl+'/showtimes?theater='+theater.id
     }, function() {
       var counter = 1;
@@ -134,7 +137,7 @@ var showtimes = function(event, response) {
         , showtimes
         , counter = 1;
     for(var i in movies) {
-      if(counter == event.post['Digits']) {
+      if(counter == event.query['Digits']) {
         movie = movies[i];
         showtimes = movie.showtimes;
         break;
