@@ -39,10 +39,9 @@ var start = function(event, response) {
 };
 
 var theaters = function(event, response) {
-  var zipcode = event.post['Digits']
+  var zipcode = event.post['Digits'] || event.post['CallerZip']
       , showtimes = new Showtimes(zipcode, {})
       , twimlResponse = new TwimlResponse();
-  console.log(event);
   showtimes.getTheaters(function(err, theaters) {
     if(err) {
       console.log(err);
