@@ -18,28 +18,6 @@ var CONST = {
   finishOnKey: '#',
   baseUrl: 'https://api.joule.run/jmathai/twilio-movie-showtimes'
 };
-var stateMap = {
-  start: {
-    action: 'gather',
-    say: 'Press one or two',
-    url: CONST.baseUrl+'/greet'
-  },
-  greet: {
-    action: 'say',
-    say: 'You entered a value'
-  }
-};
-
-var TwimlGenerator = function() {
-  this.generate = function (action, say, url) {
-    switch(action) {
-      case 'gather':
-        return ;
-      case  'say':
-        return '<?xml version="1.0" encoding="UTF-8"?> <Response> <Say voice="alice">'+say+'</Say></Response>';
-    }
-  };
-};
 
 var start = function(event, response) {
   response.send('<?xml version="1.0" encoding="UTF-8"?> <Response> <Gather timeout="10" finishOnKey="#" action="'+CONST.baseUrl+'/greet"> <Say voice="alice">Hello, I\'m Rachel. Enter your zipcode and I will look up movie showtimes for you.</Say> </Gather> </Response>');
@@ -63,7 +41,7 @@ var greet = function(event, response) {
 
     var out = '<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Looks like I found ' + theaters.length + ' theaters in your area. Here are the top ' + res.length + '.</Say>';
     for(var j in res) {
-      out += '<Say>' + res[j].name + '</Say>';
+      out += '<Say>' + res[j].name.replace(/[^0-9a-zA-Z ]/, '') + '</Say>';
       if(j <= res.length-1) {
         out += '<Pause length="3"/>';
       }
@@ -90,11 +68,10 @@ var greet = function(event, response) {
 
 exports.handler = function(event, context) {
   var response = new Response()
-      , twimlGenerator = new TwimlGenerator()
       , thisState = CONST.initialState
       , thisStateMap;
 
-  if(event.path.length > 0 && typeof(stateMap[event.path[0]]) !== 'undefined') {
+  if(event.path.length > 0) {
     thisState = event.path[0];
   }
 
