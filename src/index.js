@@ -17,7 +17,6 @@ var TwimlResponse = require('twilio').TwimlResponse;
 var CONST = {
   initialState: 'start',
   timeout: 10,
-  finishOnKey: '#',
   baseUrl: 'https://api.joule.run/jmathai/twilio-movie-showtimes',
   twimlSayOptions: {
       voice:'woman'
@@ -29,11 +28,11 @@ var start = function(event, response) {
   var twimlResponse = new TwimlResponse();
 
   twimlResponse.gather({
-      finishOnKey: '#',
+      timeout: 10,
       numDigits: 5,
       action: CONST.baseUrl+'/theaters'
     }, function() {
-      this.say('Hello, I\'m Rachel. Enter your zipcode and I will look up movie showtimes for you.', CONST.twimlSayOptions);
+      this.say('Hello, I\'m Jewel. Enter your zipcode and I will look up movie showtimes for you.', CONST.twimlSayOptions);
     }
   );
   response.send(twimlResponse.toString());
@@ -61,7 +60,6 @@ var theaters = function(event, response) {
 
     twimlResponse.say('Looks like I found ' + theaters.length + ' theaters in your area. Here are the top ' + res.length + '.', CONST.twimlSayOptions);
     twimlResponse.gather({
-      finishOnKey: '#',
       action: CONST.baseUrl+'/movies?zipcode='+zipcode
     }, function() {
       var counter = 1;
@@ -104,7 +102,6 @@ var movies = function(event, response) {
 
     twimlResponse.say('I found ' + movies.length + ' movies playing at ' + theater.name + '. Here are the top 5. You can press the movie\'s number at any time and I\'ll send you a link to purchase tickets.', CONST.twimlSayOptions);
     twimlResponse.gather({
-      finishOnKey: '#',
       action: CONST.baseUrl+'/showtimes?theater='+theater.id
     }, function() {
       var counter = 1;
@@ -157,6 +154,7 @@ exports.handler = function(event, context) {
 
   response.setContext(context);
   response.setContentType('application/xml');
+  response.setHeader('Expect', '');
   
   switch(thisState) {
     case 'start':
