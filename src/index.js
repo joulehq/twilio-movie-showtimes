@@ -68,6 +68,7 @@ var greet = function(event, response) {
         out += '<Pause length="3"/>';
       }
     }
+    out += '</Response>';
 
     response.send(out);
   });
