@@ -42,7 +42,7 @@ var theaters = function(event, response) {
   var zipcode = event.post['Digits']
       , showtimes = new Showtimes(zipcode, {})
       , twimlResponse = new TwimlResponse();
-  console.log(zipcode);
+  console.log(event);
   showtimes.getTheaters(function(err, theaters) {
     if(err) {
       console.log(err);
@@ -81,8 +81,9 @@ var theaters = function(event, response) {
 var movies = function(event, response) {
   var showtimes = new Showtimes(event.query['zipcode'], {})
       , twimlResponse = new TwimlResponse();
+
   showtimes.getTheaters(function(err, theaters) {
-    var movies
+    var movies = []
         , theater;
     if(err) {
       console.log(err);
