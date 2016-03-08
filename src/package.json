@@ -4,10 +4,11 @@
   "description": "Boilerplate template for creating joules.",
   "main": "index.js",
   "dependencies": {
-    "joule-node-response": "<2.0.0"
+    "joule-node-response": "<2.0.0",
+    "showtimes": "^2.1.0"
   },
   "devDependencies": {
-    "joule-node-local": "0.0.5"
+    "joule-node-local": "<2.0.0"
   },
   "scripts": {
     "test": "node ./node_modules/joule-node-local/index.js"
