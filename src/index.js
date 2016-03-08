@@ -160,7 +160,7 @@ var showtimes = function(event, response) {
     }, function() {
       var counter = 1;
       for(var i=0; i<showtimes.length; i++) {
-        this.say('Press ' + counter + ' for ' + showtimes[i]);
+        this.say('Press ' + counter + ' for ' + showtimes[i], CONST.twimlSayOptions);
         counter++;
       }
     });
