@@ -30,7 +30,7 @@ var start = function(event, response) {
 
   twimlResponse.gather({
       finishOnKey: '#',
-      action: CONST.baseUrl+'/greet'
+      action: CONST.baseUrl+'/theaters'
     }, function() {
       this.say('Hello, I\'m Rachel. Enter your zipcode and I will look up movie showtimes for you.', CONST.twimlSayOptions);
     }
@@ -38,10 +38,11 @@ var start = function(event, response) {
   response.send(twimlResponse.toString());
 };
 
-var greet = function(event, response) {
+var theaters = function(event, response) {
   var zipcode = event.post['Digits']
       , showtimes = new Showtimes(zipcode, {})
       , twimlResponse = new TwimlResponse();
+  console.log(zipcode);
   showtimes.getTheaters(function(err, theaters) {
     if(err) {
       console.log(err);
@@ -49,9 +50,9 @@ var greet = function(event, response) {
       response.send(twimlResponse.toString());
       return;
     }
-    
+
     var res = [];
-    for(var i in theaters) {
+    for(var i=0; i<theaters.length; i++) {
       if(i > 4) {
         break;
       }
@@ -64,7 +65,7 @@ var greet = function(event, response) {
       action: CONST.baseUrl+'/movies?zipcode='+zipcode
     }, function() {
       var counter = 1;
-      for(var j in res) {
+      for(var j=0; j<res.length; j++) {
         this.say('Press ' + counter + ' for ' + res[j].name, CONST.twimlSayOptions);
         if(j <= res.length-1) {
           this.pause({length: 1});
@@ -100,16 +101,20 @@ var movies = function(event, response) {
       counter++;
     }
 
-    twimlResponse.say('I found ' + movies.length + ' movies playing at ' + theater.name + '. You can press the movie\'s number at any time and I\'ll send you a link to purchase tickets.', CONST.twimlSayOptions);
+    twimlResponse.say('I found ' + movies.length + ' movies playing at ' + theater.name + '. Here are the top 5. You can press the movie\'s number at any time and I\'ll send you a link to purchase tickets.', CONST.twimlSayOptions);
     twimlResponse.gather({
       finishOnKey: '#',
       action: CONST.baseUrl+'/showtimes?theater='+theater.id
     }, function() {
       var counter = 1;
-      for(var j in movies) {
-        this.say('Press ' + counter + ' for ' + movies[i].name, CONST.twimlSayOptions);
+      for(var j=0; j<movies.length; j++) {
+        this.say('Press ' + counter + ' for ' + movies[j].name, CONST.twimlSayOptions);
         if(j <= movies.length-1) {
           this.pause({length: 1});
+        }
+        
+        if(j > 4) {
+          break;
         }
         counter++;
       }
@@ -156,8 +161,8 @@ exports.handler = function(event, context) {
     case 'start':
       start(event, response);
       break;
-    case 'greet':
-      greet(event, response);
+    case 'theaters':
+      theaters(event, response);
       break;
     case 'movies':
       movies(event, response);
