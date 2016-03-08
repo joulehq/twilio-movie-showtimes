@@ -41,9 +41,9 @@ var greet = function(event, response) {
 
     var out = '<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Looks like I found ' + theaters.length + ' theaters in your area. Here are the top ' + res.length + '.</Say>';
     for(var j in res) {
-      out += '<Say>' + res[j].name.replace(/[^0-9a-zA-Z ]/, '') + '</Say>';
+      out += '<Say voice="alice">' + res[j].name.replace(/[^0-9a-zA-Z ]/, '') + '</Say>';
       if(j <= res.length-1) {
-        out += '<Pause length="3"/>';
+        out += '<Pause length="1"/>';
       }
     }
     out += '</Response>';
@@ -51,20 +51,6 @@ var greet = function(event, response) {
     response.send(out);
   });
 };
-
-/*
-<?xml version="1.0" encoding="UTF-8"?>
-
-
-
-
-<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Say voice="woman">Good morning. How do you do?</Say>
-    <Pause length="5"/>
-    <Redirect method="POST">https://twiliowebapisample.endjin.com/api/Sample</Redirect>
-</Response>
-*/
 
 exports.handler = function(event, context) {
   var response = new Response()
