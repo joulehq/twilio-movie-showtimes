@@ -11,7 +11,7 @@
  */
 var Response = require('joule-node-response');
 var Showtimes = require('./showtimes');
-var twilio = require('twilio');
+var TwilioClient = require('twilio');
 var TwimlResponse = require('twilio').TwimlResponse;
 
 var CONST = {
@@ -79,7 +79,8 @@ var theaters = function(event, response) {
 };
 
 var movies = function(event, response) {
-  var showtimes = new Showtimes(event.query['zipcode'], {})
+  var zipcode = event.query['zipcode']
+      , showtimes = new Showtimes(zipcode, {})
       , twimlResponse = new TwimlResponse();
 
   showtimes.getTheaters(function(err, theaters) {
@@ -105,7 +106,7 @@ var movies = function(event, response) {
     twimlResponse.say('I found ' + movies.length + ' movies playing at ' + theater.name + '. Here are the top 5. You can press the movie\'s number at any time and I\'ll send you a link to purchase tickets.', CONST.twimlSayOptions);
     twimlResponse.gather({
       method: 'GET',
-      action: CONST.baseUrl+'/showtimes?theater='+theater.id
+      action: CONST.baseUrl+'/showtimes?theater='+theater.id+'&zipcode='+zipcode
     }, function() {
       var counter = 1;
       for(var j=0; j<movies.length; j++) {
@@ -127,15 +128,24 @@ var movies = function(event, response) {
 };
 
 var showtimes = function(event, response) {
-  var movie
+  var zipcode = event.query['zipcode']
+      , theaterId = event.query['theater']
+      , showtimes = new Showtimes(zipcode, {})
+      , movie
       , twimlResponse = new TwimlResponse();
 
-
-  showtimes.getTheater(event.query['theater'], function(err, theater) {
-    var movies = theater.movies
+  showtimes.getTheaters(function(err, theaters) {
+    var movies
         , movie
         , showtimes
         , counter = 1;
+    for(i in theaters) {
+      if(theaters[i].id == theaterId) {
+        movies = theaters[i].movies;
+        break;
+      }
+    }
+
     for(var i in movies) {
       if(counter == event.query['Digits']) {
         movie = movies[i];
@@ -143,6 +153,36 @@ var showtimes = function(event, response) {
         break;
       }
     }
+
+    twimlResponse.gather({
+      method: 'GET',
+      action: CONST.baseUrl+'/sms'
+    }, function() {
+      var counter = 1;
+      for(var i=0; i<showtimes.length; i++) {
+        this.say('Press ' + counter + ' for ' + showtimes[i]);
+        counter++;
+      }
+    });
+
+    response.send(twimlResponse.toString());
+  });
+};
+
+var sms = function(event, response) {
+  var twilioClient = new TwilioClient(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+      , twimlResponse = new TwimlResponse();
+  twilioClient.sms.messages.post({
+      to: event.query['From'],
+      from: process.env.FROM,
+      body: 'Here is a link to watch your movie.'
+  }, function(err, text) {
+      console.log(err);
+      console.log('You sent: '+ text.body);
+      console.log('Current status of this text message is: '+ text.status);
+
+      twimlResponse.hangup();
+      response.send(twimlResponse.toString());
   });
 };
 
@@ -170,6 +210,9 @@ exports.handler = function(event, context) {
       movies(event, response);
       break;
     case 'showtimes':
+      showtimes(event, response);
+      break;
+    case 'sms':
       sms(event, response);
       break;
   }
