@@ -21,7 +21,8 @@ var CONST = {
   baseUrl: 'https://api.joule.run/jmathai/twilio-movie-showtimes',
   twimlSayOptions: {
       voice:'woman'
-  }
+  },
+  showtimesOptions: {date: '1'}
 };
 
 
@@ -42,7 +43,7 @@ var start = function(event, response) {
 
 var theaters = function(event, response) {
   var zipcode = event.query['Digits']
-      , showtimes = new Showtimes(zipcode, {})
+      , showtimes = new Showtimes(zipcode, CONST.showtimesOptions)
       , twimlResponse = new TwimlResponse();
   showtimes.getTheaters(function(err, theaters) {
     if(err) {
@@ -81,7 +82,7 @@ var theaters = function(event, response) {
 
 var movies = function(event, response) {
   var zipcode = event.query['zipcode']
-      , showtimes = new Showtimes(zipcode, {})
+      , showtimes = new Showtimes(zipcode, CONST.showtimesOptions)
       , twimlResponse = new TwimlResponse();
 
   showtimes.getTheaters(function(err, theaters) {
@@ -131,7 +132,7 @@ var movies = function(event, response) {
 var showtimes = function(event, response) {
   var zipcode = event.query['zipcode']
       , theaterId = event.query['theater']
-      , showtimes = new Showtimes(zipcode, {})
+      , showtimes = new Showtimes(zipcode, CONST.showtimesOptions)
       , movie
       , twimlResponse = new TwimlResponse();
 
@@ -159,11 +160,11 @@ var showtimes = function(event, response) {
 
     twimlResponse.gather({
       method: 'GET',
-      action: CONST.baseUrl+'/sms'
+      action: CONST.baseUrl+'/sms?link='+escape(showtimes[0].link)
     }, function() {
       var counter = 1;
       for(var i=0; i<showtimes.length; i++) {
-        this.say('Press ' + counter + ' for ' + showtimes[i], CONST.twimlSayOptions);
+        this.say('Press ' + counter + ' for ' + showtimes[i]['time'], CONST.twimlSayOptions);
         counter++;
       }
     });
@@ -178,7 +179,7 @@ var sms = function(event, response) {
   twilioClient.sms.messages.post({
       to: event.query['From'],
       from: process.env.FROM,
-      body: 'Here is a link to watch your movie.'
+      body: 'Here is a link to watch your movie. ' + event.query['link']
   }, function(err, text) {
       console.log(err);
       console.log('You sent: '+ text.body);

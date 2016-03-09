@@ -198,6 +198,8 @@ Showtimes.prototype.getTheaters = function (cb) {
         // previous (later) meridiem to the next (earlier) movie showtime so we end up with something like
         // ["10:00am", "11:20am", "1:00pm", ...].
         showtimes = movie.find('.times').text().split(' ')
+        var spans = movie.find('.times a')
+
         meridiem = false
 
         showtimes = showtimes.reverse()
@@ -211,12 +213,17 @@ Showtimes.prototype.getTheaters = function (cb) {
             showtime += meridiem
           }
 
-          showtimes[x] = showtime
+          linkHref = spans.attr('href')
+          var ticketUrl = null
+          if(typeof(linkHref) !== 'undefined') {
+            ticketUrl = unescape(qs.parse(url.parse(linkHref).query).q)
+          }
+          showtimes[x] = {time: showtime, x: x, link: ticketUrl}
         }
 
         showtimes = showtimes.reverse()
         for (x in showtimes) {
-          movieData.showtimes.push(showtimes[x].trim())
+          movieData.showtimes.push(showtimes[x])
         }
 
         theaterData.movies.push(movieData)
