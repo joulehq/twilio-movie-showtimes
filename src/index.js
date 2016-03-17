@@ -165,7 +165,7 @@ var showtimes = function(event, response) {
     }, function() {
       var counter = 1;
       for(var i=0; i<showtimes.length; i++) {
-        this.say('Press ' + counter + ' for ' + showtimes[i]['time'], CONST.twimlSayOptions);
+        this.say('Press ' + counter + ' for ' + showtimes[i], CONST.twimlSayOptions);
         counter++;
       }
     });
@@ -182,7 +182,7 @@ var sms = function(event, response) {
       from: process.env.FROM,
       body: 'Here is a link to watch your movie. ' + event.query['link']
   }, function(err, text) {
-      twimlResponse.say('Thanks. I\'ve sent a link to your phone.', CONST.twimlSayOptions);
+      twimlResponse.say('Thanks. I\'ve sent a link to your phone. Please call back soon.', CONST.twimlSayOptions);
       twimlResponse.hangup();
       response.send(twimlResponse.toString());
   });
