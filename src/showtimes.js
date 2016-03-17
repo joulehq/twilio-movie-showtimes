@@ -212,13 +212,6 @@ Showtimes.prototype.getTheaters = function (cb) {
           } else if (meridiem) {
             showtime += meridiem
           }
-
-          linkHref = spans.attr('href')
-          var ticketUrl = null
-          if(typeof(linkHref) !== 'undefined') {
-            ticketUrl = unescape(qs.parse(url.parse(linkHref).query).q)
-          }
-          showtimes[x] = {time: showtime, x: x, link: ticketUrl}
         }
 
         showtimes = showtimes.reverse()
