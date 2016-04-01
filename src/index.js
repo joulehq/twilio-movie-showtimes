@@ -189,6 +189,7 @@ var sms = function(event, response) {
 };
 
 exports.handler = function(event, context) {
+  console.log(event);
   var response = new Response()
       , thisState = CONST.initialState
       , thisStateMap;
